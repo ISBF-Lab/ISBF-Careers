@@ -72,7 +72,7 @@ RSpec.describe IsbfCareers do
       end
       topic
     end
-    Topic.preload_custom_fields(topics, [described_class::HOME_FIELD])
+    Topic.preload_custom_fields(topics, [described_class::HOME_FIELD, described_class::SALARY_FIELD, described_class::DESCRIPTION_FIELD])
     expect(topics.map { |topic| described_class.metadata(topic) }).to eq(
       [{ salary: nil, show_on_home: true, description: "" }, { salary: nil, show_on_home: false, description: "" }, { salary: nil, show_on_home: true, description: "" }],
     )
