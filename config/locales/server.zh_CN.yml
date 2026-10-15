@@ -1,0 +1,9 @@
+zh_CN:
+  site_settings:
+    isbf_careers_enabled: "启用 ISBF 求职实习。"
+    isbf_careers_publishing_enabled: "允许在求职实习分类发布新主题。"
+    isbf_careers_category_id: "现有求职实习分类 ID；0 表示未配置。"
+  isbf_careers:
+    invalid_category: "请选择现有分类，且不能与其他已配置的 ISBF 业务分类共用。"
+    invalid: "请填写真实标题和正文，薪资最多 120 字，选择有效首页展示选项并使用具名身份。"
+    anonymous_not_allowed: "求职实习不允许匿名发布或回复。"
