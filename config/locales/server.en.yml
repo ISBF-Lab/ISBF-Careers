@@ -1,0 +1,9 @@
+en:
+  site_settings:
+    isbf_careers_enabled: "Enable native ISBF careers topics."
+    isbf_careers_publishing_enabled: "Allow new topics in the configured careers category."
+    isbf_careers_category_id: "ID of the existing Discourse careers category; 0 disables integration."
+  isbf_careers:
+    invalid_category: "Choose an existing category distinct from other configured ISBF service categories."
+    invalid: "Career posts require a real title and body, a salary of up to 120 characters, valid home visibility, and a named account."
+    anonymous_not_allowed: "Anonymous posting and replies are not allowed in the careers category."

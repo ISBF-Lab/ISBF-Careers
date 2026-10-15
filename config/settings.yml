@@ -1,0 +1,10 @@
+plugins:
+  isbf_careers_enabled:
+    default: true
+    client: true
+  isbf_careers_publishing_enabled:
+    default: true
+  isbf_careers_category_id:
+    default: 0
+    type: integer
+    validator: IsbfCareersCategoryIdValidator
