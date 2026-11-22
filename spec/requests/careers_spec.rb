@@ -61,6 +61,43 @@ RSpec.describe "ISBF careers native integration", type: :request do
     topic
   end
 
+  it "pauses only the workbench page, filter and listing writes" do
+    topic = make_careers
+    sign_in(member)
+
+    maintenance = Module.new do
+      def self.paused?(key)
+        key.to_s == "careers"
+      end
+
+      def self.ensure_available!(key)
+        raise Discourse::NotFound if paused?(key)
+      end
+    end
+    stub_const(Object, :IsbfWorkbenchMaintenance, maintenance) do
+      get "/isbf/careers", headers: { "HTTP_ACCEPT" => "text/html" }
+      expect(response.status).to eq(404)
+      get "/filter.json", params: { q: "isbf-careers:all order:created" }
+      expect(response.status).to eq(404)
+      expect { submit }.not_to change(Topic, :count)
+      expect(response.status).to eq(404)
+      update_careers_post(topic.first_post, raw: "Updated campus opportunity details.")
+      expect(response.status).to eq(404)
+
+      get "/t/#{topic.id}.json"
+      expect(response.status).to eq(200)
+      get "/filter.json", params: { q: "category:#{category.slug}" }
+      expect(topic_ids).to include(topic.id)
+    end
+
+    get "/isbf/careers", headers: { "HTTP_ACCEPT" => "text/html" }
+    expect(response.status).to eq(200)
+    get "/filter.json", params: { q: "isbf-careers:all order:created" }
+    expect(topic_ids).to include(topic.id)
+    submit
+    expect(response.status).to eq(200)
+  end
+
   it "preserves salary and native content through create, revision, body edits and clearing" do
     submit(isbf_careers_salary: "  面议 / 200元每天  ")
     first = created_post

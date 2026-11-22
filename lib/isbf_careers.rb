@@ -8,6 +8,10 @@ module IsbfCareers
   HOME_FIELD = "isbf_careers_home"
   ANONYMOUS_FIELD = "isbf_per_post_anonymous"
 
+  def self.ensure_workbench_available!
+    ::IsbfWorkbenchMaintenance.ensure_available!(:careers) if defined?(::IsbfWorkbenchMaintenance)
+  end
+
   def self.category_id
     id = SiteSetting.isbf_careers_category_id.to_i
     id if id.positive?
@@ -82,6 +86,11 @@ module IsbfCareers
   end
 
   def self.validate_creation!(user, options, guardian: Guardian.new(user))
+    if supplied?(options) ||
+         (options[:topic_id].blank? && options[:category].to_i == category_id &&
+          options[:archetype] != Archetype.private_message)
+      ensure_workbench_available!
+    end
     return unless SiteSetting.isbf_careers_enabled
     targeted = target?(options)
     raise Discourse::InvalidParameters.new(HOME_FIELD) if supplied?(options) && !targeted
@@ -122,8 +131,14 @@ module IsbfCareers
   end
 
   def self.validate_update!(editor, post, fields)
-    return unless SiteSetting.isbf_careers_enabled
     target_category = fields[:category_id].nil? ? post.topic.category_id : fields[:category_id].to_i
+    feature_category = category_id
+    if supplied?(fields) ||
+         (feature_category && post.is_first_post? && !post.topic.private_message? &&
+          [post.topic.category_id, target_category].include?(feature_category))
+      ensure_workbench_available!
+    end
+    return unless SiteSetting.isbf_careers_enabled
     targeted = careers?(post.topic) || (post.is_first_post? && target_category == category_id)
     if supplied?(fields) && (!targeted || !post.is_first_post? || target_category != category_id)
       raise Discourse::InvalidParameters.new(HOME_FIELD)
@@ -167,6 +182,7 @@ module IsbfCareers
   end
 
   def self.filter(topics, values, guardian)
+    ensure_workbench_available!
     return topics.none unless enabled? && guardian.user && values == ["all"]
     category = Category.find_by(id: category_id)
     return topics.none unless category && guardian.can_see_category?(category)
