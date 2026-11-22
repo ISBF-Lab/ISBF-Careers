@@ -10,6 +10,7 @@ module IsbfCareers
     requires_login
     requires_plugin "isbf-careers"
     skip_before_action :check_xhr, only: :page
+    prepend_before_action { IsbfCareers.ensure_workbench_available! }
 
     def page
       category = Category.find_by(id: IsbfCareers.category_id)
